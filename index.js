@@ -14,89 +14,42 @@ const pixels = [
 ]
 
 const k = 3;
-generatePalette(pixels, k);
+const palette = generatePalette(pixels, k);
+palette.forEach(colour => console.log(colour.toHEX()));
 
-function generatePalette(pixels, k) {
-    // initialize data 
+function generatePalette(pixels, k, max_iterations=50) {
     let iterations = 0;
-    let oldCentroids, labels, centroids;
+    let oldCentroids, centroids, clusters;
 
     // initialize centroids randomly
     centroids = getRandomCentroids(pixels, k);
 
     // run the K-means algorithm
-    while (!shouldStop(oldCentroids, centroids, iterations)) {
+    while (!shouldStop(oldCentroids, centroids, iterations, max_iterations)) {
         // save the old centroids for convergence test
         oldCentroids = [...centroids];
         iterations++;
 
-        // assign labels to each pixel based on centroids
-        labels = getLabels(pixels, centroids);
-        centroids = recalculateCentroids(pixels, labels)
-    }
+        // assign clusters to each pixel based on centroids
+        clusters = clusterize(pixels, centroids);
 
-    console.log(labels);
-    centroids.forEach(centroid => console.log(centroid.toHEX()));
-}
-
-// select k random pixels as centroids
-function getRandomCentroids(pixels, k) {
-    // generate a random list of k indicies
-    const numPixels = pixels.length;
-    const randomIndicies = [];
-    while (randomIndicies.length < k) {
-        const index = random(0, numPixels);
-        if (randomIndicies.indexOf(index) === -1) {
-            randomIndicies.push(index);
-        }
-    }
-
-    // get centroids from random indicies
-    const centroids = [];
-    for (let i = 0; i < randomIndicies.length; i++) {
-        const centroid = pixels[randomIndicies[i]];
-        centroids.push(centroid);
+        // recalculate the centroids
+        centroids = recalculateCentroids(pixels, clusters)
     }
     return centroids;
 }
 
-// gennerate a random number between min and max (inclusive)
-function random(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
-}
-
-// determine whether to stop iterating the K-means algorithm
-function shouldStop(oldCentroids, centroids, iterations) {
-    // stop if the number of iterations exceeds the max
-    if (iterations > MAX_ITERATIONS) {
-        return true;
-    }
-
-    // convergence test
-    if (!oldCentroids || !oldCentroids.length) {
-        return false;
-    }
-
-    for (let i = 0; i < centroids.length; i++) {
-        if (!_.isEqual(centroids[i].attributes, oldCentroids[i].attributes)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function getLabels(pixels, centroids) {
-    // set up labels data structure
-    const labels = {};
+function clusterize(pixels, centroids) {
+    // set up the clusters data structure
+    const clusters = {};
     for (let c = 0; c < centroids.length; c++) {
-        labels[c] = {
+        clusters[c] = {
             pixels: [],
             centroid: centroids[c],
         };
     }
 
-    // For each element in the dataset, choose the closest centroid. 
-    // Make that centroid the element's label.
+    // for each pixel, choose the "closest" centroid
     for (let i = 0; i < pixels.length; i++) {
         const pixel = pixels[i];
         let closestCentroid, closestCentroidIndex, prevDistance;
@@ -107,7 +60,6 @@ function getLabels(pixels, centroids) {
                 closestCentroidIndex = j;
                 prevDistance = getDistance(pixel, closestCentroid);
             } else {
-                // get distance:
                 const distance = getDistance(pixel, centroid);
                 if (distance < prevDistance) {
                     prevDistance = distance;
@@ -116,33 +68,24 @@ function getLabels(pixels, centroids) {
                 }
             }
         }
-        // add point to centroid labels:
-        labels[closestCentroidIndex].pixels.push(pixel);
+
+        // add pixel to centroid's cluster
+        clusters[closestCentroidIndex].pixels.push(pixel);
     }
-    return labels;
+    return clusters;
 }
 
-function getDistance(pixel1, pixel2) {
-    const diffs = [];
-    diffs.push(pixel1.red - pixel2.red);
-    diffs.push(pixel1.green - pixel2.green);
-    diffs.push(pixel1.blue - pixel2.blue);
-    return diffs.reduce((r, e) => (r + (e * e)), 0);
-}
-
-function recalculateCentroids(pixels, labels) {
-    // Each centroid is the geometric mean of the points that
-    // have that centroid's label. Important: If a centroid is empty (no points have
-    // that centroid's label) you should randomly re-initialize it.
+// recalculate the centroids assigned to each cluster
+function recalculateCentroids(pixels, clusters) {
     let newCentroid;
     const newCentroidList = [];
-    for (const label in labels) {
-        const centroidGroup = labels[label];
+    for (const index in clusters) {
+        const centroidGroup = clusters[index];
         if (centroidGroup.pixels.length > 0) {
-            // find mean:
+            // each centroid is a geometric mean or average of the pixels in that cluster
             newCentroid = average(centroidGroup.pixels);
         } else {
-            // get new random centroid
+            // if a centroid is empty, it should be randomly re-initialized
             newCentroid = getRandomCentroids(pixels, 1)[0];
         }
         newCentroidList.push(newCentroid);
@@ -150,6 +93,50 @@ function recalculateCentroids(pixels, labels) {
     return newCentroidList;
 }
 
+// determine whether to stop iterating the K-means algorithm
+function shouldStop(oldCentroids, centroids, iterations, max_iterations) {
+    // stop if the number of iterations exceeds the max
+    if (iterations > max_iterations) {
+        return true;
+    }
+
+    // don't stop if no old centroids to perform convergence test
+    if (!oldCentroids || !oldCentroids.length) {
+        return false;
+    }
+
+    // convergence test; don't stop if old centroids and new centroids have changed
+    // the K-means algorithm has converged when the centroid assignments no longer change
+    for (let i = 0; i < centroids.length; i++) {
+        if (!_.isEqual(centroids[i].attributes, oldCentroids[i].attributes)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// select n random pixels as centroids
+function getRandomCentroids(pixels, n) {
+    // generate a random list of n indicies
+    const randomIndicies = [];
+    while (randomIndicies.length < n) {
+        const index = random(0, pixels.length);
+        if (randomIndicies.indexOf(index) === -1) {
+            randomIndicies.push(index);
+        }
+    }
+
+    // return centroids from random indicies
+    const centroids = randomIndicies.map(index => pixels[index]);
+    return centroids;
+}
+
+// gennerate a random number between min and max (inclusive)
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
+// determine the geometric mean of all pixels
 function average(pixels) {
     let red2 = 0;
     let green2 = 0;
@@ -165,4 +152,13 @@ function average(pixels) {
     const green = Math.sqrt(green2 / numPixels);
     const blue = Math.sqrt(blue2 / numPixels);
     return Colour.RGB(red, green, blue);
+}
+
+// calculate the (squared) Euclidean distance between two pixels
+function getDistance(pixel1, pixel2) {
+    const diffs = [];
+    diffs.push(pixel1.red - pixel2.red);
+    diffs.push(pixel1.green - pixel2.green);
+    diffs.push(pixel1.blue - pixel2.blue);
+    return diffs.reduce((r, e) => (r + (e * e)), 0);
 }
