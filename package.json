@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tsaruggan/matisse-palette#readme",
   "dependencies": {
+    "lodash": "^4.17.21",
     "matisse": "^1.0.7",
     "node-kmeans": "^1.1.9"
   }

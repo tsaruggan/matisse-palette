@@ -1,23 +1,7 @@
 import Colour, * as matisse from "matisse";
 import _ from "lodash";
-const MAX_ITERATIONS = 50;
 
-const pixels = [
-    new Colour("#67598B"),
-    new Colour("#6F4048"),
-    new Colour("#9C81B9"),
-    new Colour("#886381"),
-    new Colour("#111024"),
-    new Colour("#E7A3B9"),
-    new Colour("#4C252A"),
-    new Colour("#E48D85"),
-]
-
-const k = 3;
-const palette = generatePalette(pixels, k);
-palette.forEach(colour => console.log(colour.toHEX()));
-
-function generatePalette(pixels, k, max_iterations=50) {
+export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance, meanFn = geometricMeanRGB, max_iterations = 50) {
     let iterations = 0;
     let oldCentroids, centroids, clusters;
 
@@ -31,15 +15,15 @@ function generatePalette(pixels, k, max_iterations=50) {
         iterations++;
 
         // assign clusters to each pixel based on centroids
-        clusters = clusterize(pixels, centroids);
+        clusters = clusterize(pixels, centroids, distanceFn);
 
         // recalculate the centroids
-        centroids = recalculateCentroids(pixels, clusters)
+        centroids = recalculateCentroids(pixels, clusters, meanFn)
     }
     return centroids;
 }
 
-function clusterize(pixels, centroids) {
+function clusterize(pixels, centroids, distanceFn) {
     // set up the clusters data structure
     const clusters = {};
     for (let c = 0; c < centroids.length; c++) {
@@ -58,9 +42,9 @@ function clusterize(pixels, centroids) {
             if (j === 0) {
                 closestCentroid = centroid;
                 closestCentroidIndex = j;
-                prevDistance = getDistance(pixel, closestCentroid);
+                prevDistance = distanceFn(pixel, closestCentroid);
             } else {
-                const distance = getDistance(pixel, centroid);
+                const distance = distanceFn(pixel, centroid);
                 if (distance < prevDistance) {
                     prevDistance = distance;
                     closestCentroid = centroid;
@@ -76,14 +60,14 @@ function clusterize(pixels, centroids) {
 }
 
 // recalculate the centroids assigned to each cluster
-function recalculateCentroids(pixels, clusters) {
+function recalculateCentroids(pixels, clusters, meanFn) {
     let newCentroid;
     const newCentroidList = [];
     for (const index in clusters) {
         const centroidGroup = clusters[index];
         if (centroidGroup.pixels.length > 0) {
             // each centroid is a geometric mean or average of the pixels in that cluster
-            newCentroid = average(centroidGroup.pixels);
+            newCentroid = meanFn(centroidGroup.pixels);
         } else {
             // if a centroid is empty, it should be randomly re-initialized
             newCentroid = getRandomCentroids(pixels, 1)[0];
@@ -136,13 +120,22 @@ function random(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+// calculate the (squared) Euclidean distance between two pixels
+function squaredEuclideanDistance(pixel1, pixel2) {
+    const diffs = [];
+    diffs.push(pixel1.red - pixel2.red);
+    diffs.push(pixel1.green - pixel2.green);
+    diffs.push(pixel1.blue - pixel2.blue);
+    return diffs.reduce((r, e) => (r + (e * e)), 0);
+}
+
 // determine the geometric mean of all pixels
-function average(pixels) {
+function geometricMeanRGB(pixels) {
     let red2 = 0;
     let green2 = 0;
     let blue2 = 0;
     for (let i = 0; i < pixels.length; i++) {
-        red2  += pixels[i].red ** 2;
+        red2 += pixels[i].red ** 2;
         green2 += pixels[i].green ** 2;
         blue2 += pixels[i].blue ** 2;
     }
@@ -152,13 +145,4 @@ function average(pixels) {
     const green = Math.sqrt(green2 / numPixels);
     const blue = Math.sqrt(blue2 / numPixels);
     return Colour.RGB(red, green, blue);
-}
-
-// calculate the (squared) Euclidean distance between two pixels
-function getDistance(pixel1, pixel2) {
-    const diffs = [];
-    diffs.push(pixel1.red - pixel2.red);
-    diffs.push(pixel1.green - pixel2.green);
-    diffs.push(pixel1.blue - pixel2.blue);
-    return diffs.reduce((r, e) => (r + (e * e)), 0);
 }
