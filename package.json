@@ -1,0 +1,19 @@
+{
+  "name": "matisse-palette",
+  "version": "1.0.0",
+  "description": "generate colour palettes from images using K-means clustering",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsaruggan/matisse-palette.git"
+  },
+  "author": "tsaruggan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tsaruggan/matisse-palette/issues"
+  },
+  "homepage": "https://github.com/tsaruggan/matisse-palette#readme"
+}
