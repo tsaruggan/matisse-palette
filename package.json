@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "generate colour palettes from images using K-means clustering",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/tsaruggan/matisse-palette/issues"
   },
-  "homepage": "https://github.com/tsaruggan/matisse-palette#readme"
+  "homepage": "https://github.com/tsaruggan/matisse-palette#readme",
+  "dependencies": {
+    "node-kmeans": "^1.1.9"
+  }
 }
