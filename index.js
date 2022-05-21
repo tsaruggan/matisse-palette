@@ -1,7 +1,6 @@
 import Colour, * as matisse from "matisse";
-import { clusterize } from 'node-kmeans';
 
-const colours = [
+const pixels = [
     new Colour("#67598B"),
     new Colour("#6F4048"),
     new Colour("#9C81B9"),
@@ -11,17 +10,42 @@ const colours = [
     new Colour("#4C252A"),
     new Colour("#E48D85"),
 ]
+const k = 3;
+generatePalette(pixels, k);
 
-let vectors = new Array();
-for (let i = 0; i < colours.length; i++) {
-    vectors[i] = [colours[i].red, colours[i].green, colours[i].blue];
+function generatePalette(pixels, k) {
+    // initialize data 
+    let iterations = 0;
+    let oldCentroids, labels, centroids;
+
+    // initialize centroids randomly
+    centroids = getRandomCentroids(pixels, k);
+    console.log(centroids);
 }
 
-clusterize(vectors, { k: 3 }, (err, res) => {
-    if (err) console.error(err);
-    else res.forEach(element => {
-        const centroid = element.centroid;
-        const colour = Colour.RGB(centroid[0], centroid[1], centroid[2]);
-        console.log(colour.toHEX());
-    });
-});
+// select k random pixels as centroids
+function getRandomCentroids(pixels, k) {
+    // generate a random list of k indicies
+    const numPixels = pixels.length;
+    const randomIndicies = [];
+    while (randomIndicies.length < k) {
+        const index = random(0, numPixels);
+        if (randomIndicies.indexOf(index) === -1) {
+            randomIndicies.push(index);
+        }
+    }
+
+    // get centroids from random indicies
+    const centroids = [];
+    for (let i = 0; i < randomIndicies.length; i++) {
+        const centroid = pixels[randomIndicies[i]];
+        centroids.push(centroid);
+    }
+    return centroids;
+}
+
+// gennerate a random number between min and max (inclusive)
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
