@@ -126,7 +126,7 @@ function squaredEuclideanDistance(pixel1, pixel2) {
     diffs.push(pixel1.red - pixel2.red);
     diffs.push(pixel1.green - pixel2.green);
     diffs.push(pixel1.blue - pixel2.blue);
-    return diffs.reduce((r, e) => (r + (e * e)), 0);
+    return diffs.reduce((previous, current) => (previous + (current * current)), 0);
 }
 
 // determine the geometric mean of all pixels

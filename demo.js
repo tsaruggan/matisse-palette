@@ -1,5 +1,5 @@
 import { generatePalette } from "./index.js";
-import Colour from "matisse";
+import Colour, * as matisse from "matisse";
 
 const pixels = [
     new Colour("#67598B"),
@@ -13,5 +13,9 @@ const pixels = [
 ]
 
 const k = 3;
-const palette = generatePalette(pixels, k);
+const palette = generatePalette(pixels, k, 
+    (pixel1, pixel2) => {
+        const diff = matisse.colourfulness(pixel1) - matisse.colourfulness(pixel2);
+        return diff ** 2;
+    });
 palette.forEach(colour => console.log(colour.toHEX()));
