@@ -1,4 +1,5 @@
 import Colour, * as matisse from "matisse";
+import getPixels from "get-pixels";
 
 /**
  * Generate a colour palette based on an image given a flattened array of image pixel colours. Palette generation
@@ -32,8 +33,22 @@ export function generatePalette(
     return palette;
 }
 
-function extractPixels() {
-    
+export function extractPixels(path, callback) {
+    getPixels(path, (error, image) => {
+        if (error) {
+            console.log("The path provided is not supported.", error);
+            return
+        }
+        
+        const width = image.shape[0], height = image.shape[1], numChannels = image.shape[2];
+        let reds, greens, blues, alphas;
+        reds = image.pick(null, null, 0);
+        greens = image.pick(null, null, 1);
+        blues = image.pick(null, null, 2);
+        alphas = image.pick(null, null, 3);
+        const pixels = pixelsFromChannels(reds, greens, blues, alphas, width, height);
+        callback(pixels);
+    });
 }
 
 // perform the K-means clustering algorithm and return the centroids
@@ -180,4 +195,25 @@ function geometricMeanRGB(pixels) {
     const green = Math.sqrt(greenSquared / numPixels);
     const blue = Math.sqrt(blueSquared / numPixels);
     return Colour.RGB(red, green, blue);
+}
+
+// given ndarrays of red, green, blue, and alpha? channels, convert into flattened array of colours
+function pixelsFromChannels(reds, greens, blues, alphas, width, height) {
+    const pixels = [];
+    for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+            let red = reds.get(i, j);
+            let green = greens.get(i, j);
+            let blue = blues.get(i, j);
+            let alpha = 1.00;
+
+            if (alphas) {
+                alpha = alphas.get(i, j) / 255;
+            }
+
+            const pixel = Colour.RGB(red, green, blue, alpha);
+            pixels.push(pixel);
+        }
+    }
+    return pixels;
 }
