@@ -1,6 +1,11 @@
 import Colour, * as matisse from "matisse";
 
 export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance, meanFn = geometricMeanRGB, maxIterations = 50) {
+    const palette = kMeans(pixels, k, distanceFn, meanFn, maxIterations);
+    return palette;
+}
+
+function kMeans(pixels, k, distanceFn, meanFn, maxIterations) {
     let iterations = 0;
     let oldCentroids, centroids, clusters;
 
