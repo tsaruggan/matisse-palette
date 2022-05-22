@@ -13,9 +13,8 @@ const pixels = [
 ]
 
 const k = 3;
-const palette = generatePalette(pixels, k, 
-    (pixel1, pixel2) => {
-        const diff = matisse.colourfulness(pixel1) - matisse.colourfulness(pixel2);
-        return diff ** 2;
-    });
+const palette = generatePalette(pixels, k, (pixel1, pixel2) => {
+    const distance = matisse.temperature(pixel1) - matisse.temperature(pixel2);
+    return Math.abs(distance);
+});
 palette.forEach(colour => console.log(colour.toHEX()));

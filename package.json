@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/tsaruggan/matisse-palette#readme",
   "dependencies": {
-    "matisse": "^1.0.8"
+    "matisse": "^1.0.9"
   }
 }
