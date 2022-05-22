@@ -47,7 +47,7 @@ export function extractPixels(path, callback) {
         }
 
         try {
-            const width = image.shape[0], height = image.shape[1], numChannels = image.shape[2];
+            const width = image.shape[0], height = image.shape[1];
             const reds = image.pick(null, null, 0);
             const greens = image.pick(null, null, 1);
             const blues = image.pick(null, null, 2);
