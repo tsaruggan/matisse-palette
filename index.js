@@ -33,21 +33,30 @@ export function generatePalette(
     return palette;
 }
 
+/**
+ * Given a URL/path, extract all the pixels from an image and return the resulting flattened array of Colour instances.
+ * Note: Image file reading is handled by [scijs/get-pixels](https://github.com/scijs/get-pixels).
+ * @param {string} path - A path to a JPEG or PNG file. This can be a relative path, an HTTP URL, or a data URL.
+ * @param {function(Colour[]):any} callback - A callback which gets triggered once the pixels are loaded. 
+ */
 export function extractPixels(path, callback) {
     getPixels(path, (error, image) => {
         if (error) {
-            console.log("The path provided is not supported.", error);
-            return
+            callback(undefined, error);
+            return;
         }
-        
-        const width = image.shape[0], height = image.shape[1], numChannels = image.shape[2];
-        let reds, greens, blues, alphas;
-        reds = image.pick(null, null, 0);
-        greens = image.pick(null, null, 1);
-        blues = image.pick(null, null, 2);
-        alphas = image.pick(null, null, 3);
-        const pixels = pixelsFromChannels(reds, greens, blues, alphas, width, height);
-        callback(pixels);
+
+        try {
+            const width = image.shape[0], height = image.shape[1], numChannels = image.shape[2];
+            const reds = image.pick(null, null, 0);
+            const greens = image.pick(null, null, 1);
+            const blues = image.pick(null, null, 2);
+            const alphas = image.pick(null, null, 3);
+            const pixels = pixelsFromChannels(reds, greens, blues, alphas, width, height);
+            callback(pixels);
+        } catch (error) {
+            callback(undefined, error);
+        }
     });
 }
 

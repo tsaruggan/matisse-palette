@@ -1,6 +1,6 @@
 {
   "name": "matisse-palette",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "generate colour palettes from images using K-means clustering",
   "main": "index.js",
   "type": "module",
