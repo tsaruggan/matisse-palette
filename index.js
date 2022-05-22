@@ -5,12 +5,12 @@ export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance
     return palette;
 }
 
-function kMeans(pixels, k, distanceFn, meanFn, maxIterations) {
+function kMeans(points, k, distanceFn, meanFn, maxIterations) {
     let iterations = 0;
     let oldCentroids, centroids, clusters;
 
     // initialize centroids randomly
-    centroids = getRandomCentroids(pixels, k);
+    centroids = getRandomCentroids(points, k);
 
     // run the K-means algorithm
     while (!shouldStop(oldCentroids, centroids, iterations, maxIterations)) {
@@ -18,37 +18,37 @@ function kMeans(pixels, k, distanceFn, meanFn, maxIterations) {
         oldCentroids = [...centroids];
         iterations++;
 
-        // assign clusters to each pixel based on centroids
-        clusters = clusterize(pixels, centroids, distanceFn);
+        // assign each point to a centroid based on proximity to centroids
+        clusters = clusterize(points, centroids, distanceFn);
 
         // recalculate the centroids
-        centroids = recalculateCentroids(pixels, clusters, meanFn)
+        centroids = recalculateCentroids(points, clusters, meanFn)
     }
     return centroids;
 }
 
-function clusterize(pixels, centroids, distanceFn) {
+function clusterize(points, centroids, distanceFn) {
     // set up the clusters data structure
     const clusters = {};
     for (let c = 0; c < centroids.length; c++) {
         clusters[c] = {
-            pixels: [],
+            points: [],
             centroid: centroids[c],
         };
     }
 
-    // for each pixel, choose the "closest" centroid
-    for (let i = 0; i < pixels.length; i++) {
-        const pixel = pixels[i];
+    // for each point, choose the "closest" centroid
+    for (let i = 0; i < points.length; i++) {
+        const point = points[i];
         let closestCentroid, closestCentroidIndex, prevDistance;
         for (let j = 0; j < centroids.length; j++) {
             let centroid = centroids[j];
             if (j === 0) {
                 closestCentroid = centroid;
                 closestCentroidIndex = j;
-                prevDistance = distanceFn(pixel, closestCentroid);
+                prevDistance = distanceFn(point, closestCentroid);
             } else {
-                const distance = distanceFn(pixel, centroid);
+                const distance = distanceFn(point, centroid);
                 if (distance < prevDistance) {
                     prevDistance = distance;
                     closestCentroid = centroid;
@@ -58,23 +58,23 @@ function clusterize(pixels, centroids, distanceFn) {
         }
 
         // add pixel to centroid's cluster
-        clusters[closestCentroidIndex].pixels.push(pixel);
+        clusters[closestCentroidIndex].points.push(point);
     }
     return clusters;
 }
 
 // recalculate the centroids assigned to each cluster
-function recalculateCentroids(pixels, clusters, meanFn) {
+function recalculateCentroids(points, clusters, meanFn) {
     let newCentroid;
     const newCentroidList = [];
     for (const index in clusters) {
         const centroidGroup = clusters[index];
-        if (centroidGroup.pixels.length > 0) {
-            // each centroid is a geometric mean or average of the pixels in that cluster
-            newCentroid = meanFn(centroidGroup.pixels);
+        if (centroidGroup.points.length > 0) {
+            // each centroid is a geometric mean or average of the points in that cluster
+            newCentroid = meanFn(centroidGroup.points);
         } else {
             // if a centroid is empty, it should be randomly re-initialized
-            newCentroid = getRandomCentroids(pixels, 1)[0];
+            newCentroid = getRandomCentroids(points, 1)[0];
         }
         newCentroidList.push(newCentroid);
     }
@@ -104,18 +104,18 @@ function shouldStop(oldCentroids, centroids, iterations, maxIterations) {
 }
 
 // select n random pixels as centroids
-function getRandomCentroids(pixels, n) {
+function getRandomCentroids(points, n) {
     // generate a random list of n indicies
     const randomIndicies = [];
     while (randomIndicies.length < n) {
-        const index = random(0, pixels.length);
+        const index = random(0, points.length);
         if (randomIndicies.indexOf(index) === -1) {
             randomIndicies.push(index);
         }
     }
 
     // return centroids from random indicies
-    const centroids = randomIndicies.map(index => pixels[index]);
+    const centroids = randomIndicies.map(index => points[index]);
     return centroids;
 }
 
