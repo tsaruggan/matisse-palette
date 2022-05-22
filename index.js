@@ -37,7 +37,7 @@ export function generatePalette(
  * Given a URL/path, extract all the pixels from an image and return the resulting flattened array of Colour instances.
  * Note: Image file reading is handled by [scijs/get-pixels](https://github.com/scijs/get-pixels).
  * @param {string} path - A path to a JPEG or PNG file. This can be a relative path, an HTTP URL, or a data URL.
- * @param {function(Colour[]):any} callback - A callback which gets triggered once the pixels are loaded. 
+ * @param {function(Colour[], Error):any} callback - A callback which gets triggered once the pixels are loaded. 
  */
 export function extractPixels(path, callback) {
     getPixels(path, (error, image) => {
