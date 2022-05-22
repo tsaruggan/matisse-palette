@@ -21,6 +21,7 @@ import getPixels from "get-pixels";
  * green, and blue channels of all the pixels.
  * @param {number} maxIterations - The maximum number of iterations to perform before terminating the K-means
  * clustering algorithm. This is necessary since the algorithm may not converge given the distance and mean functions.
+ * By default, the maximum number of iterations is set to 50.
  * @returns {Colour[]} The resulting colour palette generated.
  */
 export function generatePalette(
