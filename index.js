@@ -47,12 +47,12 @@ export function extractPixels(path, callback) {
         }
 
         try {
-            const width = image.shape[0], height = image.shape[1];
+            const width = image.shape[0];
+            const height = image.shape[1];
             const reds = image.pick(null, null, 0);
             const greens = image.pick(null, null, 1);
             const blues = image.pick(null, null, 2);
-            const alphas = image.pick(null, null, 3);
-            const pixels = pixelsFromChannels(reds, greens, blues, alphas, width, height);
+            const pixels = pixelsFromChannels(reds, greens, blues, width, height);
             callback(pixels);
         } catch (error) {
             callback(undefined, error);
@@ -206,21 +206,15 @@ function geometricMeanRGB(pixels) {
     return Colour.RGB(red, green, blue);
 }
 
-// given ndarrays of red, green, blue, and alpha? channels, convert into flattened array of colours
-function pixelsFromChannels(reds, greens, blues, alphas, width, height) {
+// given ndarrays of red, green, and blue channels, convert into flattened array of colours
+function pixelsFromChannels(reds, greens, blues, width, height) {
     const pixels = [];
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
-            let red = reds.get(i, j);
-            let green = greens.get(i, j);
-            let blue = blues.get(i, j);
-            let alpha = 1.00;
-
-            if (alphas) {
-                alpha = alphas.get(i, j) / 255;
-            }
-
-            const pixel = Colour.RGB(red, green, blue, alpha);
+            const red = reds.get(i, j);
+            const green = greens.get(i, j);
+            const blue = blues.get(i, j);
+            const pixel = Colour.RGB(red, green, blue);
             pixels.push(pixel);
         }
     }
