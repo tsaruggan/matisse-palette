@@ -1,6 +1,6 @@
 import Colour, * as matisse from "matisse";
 
-export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance, meanFn = geometricMeanRGB, max_iterations = 50) {
+export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance, meanFn = geometricMeanRGB, maxIterations = 50) {
     let iterations = 0;
     let oldCentroids, centroids, clusters;
 
@@ -8,7 +8,7 @@ export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance
     centroids = getRandomCentroids(pixels, k);
 
     // run the K-means algorithm
-    while (!shouldStop(oldCentroids, centroids, iterations, max_iterations)) {
+    while (!shouldStop(oldCentroids, centroids, iterations, maxIterations)) {
         // save the old centroids for convergence test
         oldCentroids = [...centroids];
         iterations++;
@@ -77,9 +77,9 @@ function recalculateCentroids(pixels, clusters, meanFn) {
 }
 
 // determine whether to stop iterating the K-means algorithm
-function shouldStop(oldCentroids, centroids, iterations, max_iterations) {
+function shouldStop(oldCentroids, centroids, iterations, maxIterations) {
     // stop if the number of iterations exceeds the max
-    if (iterations > max_iterations) {
+    if (iterations > maxIterations) {
         return true;
     }
 
