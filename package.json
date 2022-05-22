@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tsaruggan/matisse-palette#readme",
   "dependencies": {
+    "get-pixels": "^3.3.3",
     "matisse": "^1.0.9"
   }
 }

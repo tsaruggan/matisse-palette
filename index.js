@@ -32,6 +32,10 @@ export function generatePalette(
     return palette;
 }
 
+function extractPixels() {
+    
+}
+
 // perform the K-means clustering algorithm and return the centroids
 function kMeans(points, k, distanceFn, meanFn, maxIterations) {
     let iterations = 0;
