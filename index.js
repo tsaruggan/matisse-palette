@@ -10,7 +10,7 @@ import getPixels from "get-pixels";
  * optimal solution every time.
  * @param {Colour[]} pixels - A flattened array of colours representing the pixels of an image.
  * @param {number} k - The number of colours to return in the palette. This is the number of centroids or clusters to
- * partition during the K-means clustering algorithm.
+ * partition during the K-means clustering algorithm. By default, ```k``` is set to 5.
  * @param {function(Colour, Colour):number} distanceFn - A callback function that returns a "distance" given two 
  * different pixels or Colour instances. The K-means clustering algorithm assigns pixels to the "nearest" cluster
  * based on this function. By default, the squared Euclidean distance is returned using the difference between the 
@@ -25,7 +25,7 @@ import getPixels from "get-pixels";
  */
 export function generatePalette(
     pixels,
-    k,
+    k = 5,
     distanceFn = squaredEuclideanDistanceRGB,
     meanFn = geometricMeanRGB,
     maxIterations = 50) {
