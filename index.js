@@ -1,5 +1,4 @@
 import Colour, * as matisse from "matisse";
-import _ from "lodash";
 
 export function generatePalette(pixels, k, distanceFn = squaredEuclideanDistance, meanFn = geometricMeanRGB, max_iterations = 50) {
     let iterations = 0;
@@ -92,7 +91,7 @@ function shouldStop(oldCentroids, centroids, iterations, max_iterations) {
     // convergence test; don't stop if old centroids and new centroids have changed
     // the K-means algorithm has converged when the centroid assignments no longer change
     for (let i = 0; i < centroids.length; i++) {
-        if (!_.isEqual(centroids[i].attributes, oldCentroids[i].attributes)) {
+        if (centroids[i].equals(oldCentroids[i])) {
             return false;
         }
     }
