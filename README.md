@@ -24,7 +24,7 @@ mp.extractPixels(path, (error, pixels) => {
 
 ### generatePalette(pixels, k, distanceFn, meanFn, maxIterations) ⇒ <code>Array.&lt;Colour&gt;</code>
 Generate a colour palette based on an image given a flattened array of image pixel colours. Palette generation
-is performed using [K-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) which aims to parition
+is performed using [K-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) which aims to partition
 the pixels into ```k``` different clusters. By default, the algorithm uses a squared Euclidean distance function to
 minimize within-cluster variances and a geometric mean function to recalculate centroid assignments that are both
 based on the RGB values of each colour. The algorithm is not guaranteed to produce deterministic results or the
