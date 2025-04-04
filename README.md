@@ -19,6 +19,7 @@ mp.extractPixels(path, (error, pixels) => {
     // do something cool!
 });
 ```
+![IMG_9015](https://github.com/user-attachments/assets/d3553964-25cf-4900-a143-b5aa739f921f)
 
 ## Documentation
 
